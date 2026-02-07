@@ -2,9 +2,6 @@
 
 namespace PrinzipParserAPI.Interfaces
 {
-    /// <summary>
-    /// Контракт для работы с данными квартир из любого источника
-    /// </summary>
     public interface IPrinzipApiService
     {
         /// <summary>

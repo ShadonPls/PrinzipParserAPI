@@ -13,7 +13,7 @@ public class Subscription
     public string UserUrl { get; set; } = string.Empty;
 
     /// <summary>
-    /// ID квартиры, извлеченный из URL (например, 67959)
+    /// ID квартиры, извлеченный из URL
     /// </summary>
     public int ApartmentId { get; set; }
 
@@ -23,12 +23,12 @@ public class Subscription
     public string Email { get; set; } = string.Empty;
 
     /// <summary>
-    /// Последняя известная цена (для отслеживания изменений)
+    /// Последняя известная цена
     /// </summary>
     public decimal LastPrice { get; set; }
 
     /// <summary>
-    /// Последний известный статус ("Свободна", "Забронирована" и т.д.)
+    /// Последний известный статус
     /// </summary>
     public string LastStatus { get; set; } = string.Empty;
 

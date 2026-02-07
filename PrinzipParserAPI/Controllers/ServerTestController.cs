@@ -36,7 +36,6 @@ public class ServerTestController : ControllerBase
     {
         var tasks = new List<Task>();
 
-        // 100 читателей (параллельно)
         for (int i = 0; i < 100; i++)
         {
             tasks.Add(Task.Run(() =>
@@ -48,7 +47,6 @@ public class ServerTestController : ControllerBase
             }));
         }
 
-        // 10 писателей (последовательно, благодаря WriteLock)
         for (int i = 0; i < 10; i++)
         {
             var capturedI = i;
@@ -57,7 +55,7 @@ public class ServerTestController : ControllerBase
                 for (int j = 0; j < 100; j++)
                 {
                     Server.AddToCount(1);
-                    Thread.Sleep(1); // Эмуляция долгой операции
+                    Thread.Sleep(1);
                 }
             }));
         }

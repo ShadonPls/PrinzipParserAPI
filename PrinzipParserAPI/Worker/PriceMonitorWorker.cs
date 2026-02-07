@@ -12,7 +12,7 @@ public class PriceMonitorWorker : BackgroundService
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly ILogger<PriceMonitorWorker> _logger;
-    private readonly TimeSpan _checkInterval = TimeSpan.FromHours(1); // Интервал проверки
+    private readonly TimeSpan _checkInterval = TimeSpan.FromHours(1);
 
     public PriceMonitorWorker(
         IServiceProvider serviceProvider,
@@ -26,7 +26,6 @@ public class PriceMonitorWorker : BackgroundService
     {
         _logger.LogInformation("PriceMonitorWorker запущен. Интервал проверки: {Interval}", _checkInterval);
 
-        // Небольшая задержка при старте, чтобы приложение успело полностью инициализироваться
         await Task.Delay(TimeSpan.FromSeconds(10), stoppingToken);
 
         while (!stoppingToken.IsCancellationRequested)
@@ -40,7 +39,6 @@ public class PriceMonitorWorker : BackgroundService
                 _logger.LogError(ex, "Критическая ошибка в цикле мониторинга");
             }
 
-            // Ждем до следующей проверки
             await Task.Delay(_checkInterval, stoppingToken);
         }
 
@@ -51,8 +49,6 @@ public class PriceMonitorWorker : BackgroundService
     {
         _logger.LogInformation("Начало проверки цен...");
 
-        // BackgroundService - Singleton, а DbContext - Scoped
-        // Нужно создавать scope вручную для каждой операции
         using var scope = _serviceProvider.CreateScope();
 
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
@@ -75,7 +71,6 @@ public class PriceMonitorWorker : BackgroundService
 
             try
             {
-                // Задержка между запросами, чтобы не перегружать API
                 await Task.Delay(1000, cancellationToken);
 
                 var info = await provider.GetApartmentInfoAsync(sub.ApartmentId);
@@ -89,14 +84,12 @@ public class PriceMonitorWorker : BackgroundService
 
                 bool hasChanges = false;
 
-                // Проверка изменения цены
                 if (info.Price != sub.LastPrice && sub.LastPrice != 0)
                 {
                     _logger.LogInformation(
                         "Изменение цены для подписки {SubId}: {OldPrice} → {NewPrice}",
                         sub.Id, sub.LastPrice, info.Price);
 
-                    // TODO: Здесь должна быть отправка Email
                     await SendPriceChangeEmailAsync(sub.Email, sub.UserUrl, sub.LastPrice, info.Price);
 
                     sub.LastPrice = info.Price;
@@ -104,19 +97,16 @@ public class PriceMonitorWorker : BackgroundService
                 }
                 else if (sub.LastPrice == 0)
                 {
-                    // Первая проверка - просто сохраняем текущую цену
                     sub.LastPrice = info.Price;
                     hasChanges = true;
                 }
 
-                // Проверка изменения статуса
                 if (!string.IsNullOrEmpty(info.Status) && info.Status != sub.LastStatus)
                 {
                     _logger.LogInformation(
                         "Изменение статуса для подписки {SubId}: '{OldStatus}' → '{NewStatus}'",
                         sub.Id, sub.LastStatus, info.Status);
 
-                    // TODO: Отправка Email об изменении статуса
                     await SendStatusChangeEmailAsync(sub.Email, sub.UserUrl, sub.LastStatus, info.Status);
 
                     sub.LastStatus = info.Status;

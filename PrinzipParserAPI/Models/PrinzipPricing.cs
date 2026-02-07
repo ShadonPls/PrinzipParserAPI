@@ -2,12 +2,12 @@
 
 namespace PrinzipParserAPI.Models;
 /// <summary>
-/// Информация о ценах на квартиру (может быть несколько вариантов оплаты)
+/// Информация о ценах на квартиру
 /// </summary>
 public class PrinzipPricing
 {
     [JsonPropertyName("payment_method")]
-    public string PaymentMethod { get; set; } = string.Empty; // "full", "mortgage"
+    public string PaymentMethod { get; set; } = string.Empty;
 
     [JsonPropertyName("price_base")]
     public string PriceBaseString { get; set; } = string.Empty;
@@ -17,7 +17,6 @@ public class PrinzipPricing
 
     /// <summary>
     /// Конвертация строкового представления цены в decimal
-    /// API отдает "3839242.00" (с точкой), парсим аккуратно
     /// </summary>
     [JsonIgnore]
     public decimal Price

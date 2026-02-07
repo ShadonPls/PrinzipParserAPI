@@ -18,19 +18,12 @@ public class PrinzipApiService : IPrinzipApiService
         _httpClient = httpClient;
         _logger = logger;
 
-        // Прикидываемся браузером (на случай защиты от ботов)
         _httpClient.DefaultRequestHeaders.Add("User-Agent",
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36");
     }
 
     public int? ExtractIdFromUrl(string url)
     {
-        // Паттерн для извлечения числового ID из URL
-        // Примеры URL:
-        // https://prinzip.su/apartments/park_kultury/67959/
-        // https://prinzip.su/apartments/67959
-        // /apartments/67959/
-
         var match = Regex.Match(url, @"/(\d+)/?$");
 
         if (match.Success && int.TryParse(match.Groups[1].Value, out int id))
@@ -59,7 +52,6 @@ public class PrinzipApiService : IPrinzipApiService
                 return null;
             }
 
-            // Берем цену при полной оплате (payment_method = "full")
             var fullPaymentPricing = dto.Pricings.FirstOrDefault(p => p.PaymentMethod == "full");
 
             if (fullPaymentPricing == null)

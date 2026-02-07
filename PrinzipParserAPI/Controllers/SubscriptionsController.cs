@@ -37,21 +37,18 @@ public class SubscriptionsController : ControllerBase
             return BadRequest(new { Error = "URL и Email обязательны" });
         }
 
-        // 1. Извлекаем ID квартиры из URL
         var apartmentId = _provider.ExtractIdFromUrl(url);
         if (apartmentId == null)
         {
             return BadRequest(new { Error = "Не удалось извлечь ID квартиры из URL" });
         }
 
-        // 2. Проверяем, существует ли квартира (делаем тестовый запрос)
         var info = await _provider.GetApartmentInfoAsync(apartmentId.Value);
         if (info == null)
         {
             return BadRequest(new { Error = "Квартира не найдена или API недоступно" });
         }
 
-        // 3. Проверяем, нет ли уже такой подписки
         var existing = await _db.Subscriptions
             .FirstOrDefaultAsync(s => s.ApartmentId == apartmentId && s.Email == email);
 
@@ -60,7 +57,6 @@ public class SubscriptionsController : ControllerBase
             return Conflict(new { Error = "Подписка уже существует", SubscriptionId = existing.Id });
         }
 
-        // 4. Создаем подписку
         var subscription = new Subscription
         {
             UserUrl = url,
